@@ -1,0 +1,64 @@
+Group Members: Alicia Persad, Abdullah Al Iman, Flamur Kukaj, Marvin Harricharran
+
+The variables we focused on were Income and Education Level and the impact of Education Level on Income. The code for this goes as follows:
+
+
+load("~/Library/Mobile Documents/com~apple~CloudDocs/B2000/Household_Pulse_data_ph4c2.RData")
+
+set.seed(12345)
+
+Household_Pulse_Filtered <- Household_Pulse_data %>%
+  filter(ANYWORK == "yes employment in last 7 days" & !is.na(INCOME) & !is.na(EEDUC))
+
+
+Household_Pulse_Filtered$EEDUC_Number <- as.numeric(as.factor(Household_Pulse_Filtered$EEDUC))
+
+
+
+model_education_income <- lm(INCOME ~ EEDUC_Number, data = Household_Pulse_Filtered)
+
+
+summary(model_education_income)
+
+Household_Pulse_Filtered$INCOME <- as.character(Household_Pulse_Filtered$INCOME)
+
+
+Household_Pulse_Filtered$INCOME[Household_Pulse_Filtered$INCOME == "HH income less than $25k"] <- 25000
+Household_Pulse_Filtered$INCOME[Household_Pulse_Filtered$INCOME == "HH income $25k - $34.9k"] <- 30000
+Household_Pulse_Filtered$INCOME[Household_Pulse_Filtered$INCOME == "HH income $35k - 49.9"] <- 42500
+Household_Pulse_Filtered$INCOME[Household_Pulse_Filtered$INCOME == "HH income $50k - 74.9"] <- 62500
+Household_Pulse_Filtered$INCOME[Household_Pulse_Filtered$INCOME == "HH income $75 - 99.9"] <- 87500
+Household_Pulse_Filtered$INCOME[Household_Pulse_Filtered$INCOME == "HH income $100k - 149"] <- 125000
+Household_Pulse_Filtered$INCOME[Household_Pulse_Filtered$INCOME == "HH income $150 - 199"] <- 175000
+Household_Pulse_Filtered$INCOME[Household_Pulse_Filtered$INCOME == "HH income $200k +"] <- 200000
+Household_Pulse_Filtered$INCOME[is.na(Household_Pulse_Filtered$INCOME)] <- 0  
+
+
+Household_Pulse_Filtered$INCOME <- as.numeric(Household_Pulse_Filtered$INCOME)
+
+
+ggplot(Household_Pulse_Filtered, aes(x = EEDUC_Number, y = INCOME)) +
+  geom_point(alpha = 0.5) +   
+  geom_smooth(method = "lm") +  
+  labs(title = "Impact of Education Level on Income",
+       x = "Education Level",
+       y = "Income") +
+  theme_minimal()
+
+confint(model_education_income)
+
+NNobs <- length(Household_Pulse_Filtered$INCOME)
+graph_obs <- (runif(NNobs) < 0.5)
+
+Results and Findings: 
+
+Based on the household pulse data, the focused topic on the linear regression was the impact of education level on Income. The null and alternative hypothesis goes as follows:
+
+Null Hypothesis:  Education level has no effect on income
+Alternate Hypothesis:  Education level has an effect on income
+
+	Now based on the results of the linear regression, the p value is 2e-16 which is less than 0.05 , so it is clear to reject the null hypothesis and conclude that education has an effect on income.
+
+The t-statistic is 88.35 which suggests that income is heavily dependent on education level.
+
+Based on the confidence intervals, the conclusion still remains the same that income relies on education as an increase in education level will increase income by $17304.42 - $18089.63. The confidence level also tells us that when the education level is 0 (No education) , it is concluded that the income level will be around $11,624.31 - $16,034.74.
